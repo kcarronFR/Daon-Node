@@ -388,7 +388,7 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 						}
 				}
 
-				if(key.contains("a") && key.contains("e")) {
+				if(value.toString().contains("a") && value.toString().contains("e")) {
 					n_e_flag = true;
 					System.out.println("n_e_flag is true...");
 				}
