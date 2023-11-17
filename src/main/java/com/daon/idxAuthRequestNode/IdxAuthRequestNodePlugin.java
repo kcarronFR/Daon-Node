@@ -56,7 +56,7 @@ import org.forgerock.openam.plugins.PluginException;
  */
 public class IdxAuthRequestNodePlugin extends AbstractNodeAmPlugin {
 
-	static String currentVersion = "1.6.8";
+	static String currentVersion = "1.7.1";
 	
     /** 
      * Specify the Map of list of node classes that the plugin is providing. These will then be installed and
@@ -68,7 +68,7 @@ public class IdxAuthRequestNodePlugin extends AbstractNodeAmPlugin {
 	protected Map<String, Iterable<? extends Class<? extends Node>>> getNodesByVersion() {
 		return Collections.singletonMap(IdxAuthRequestNodePlugin.currentVersion, 
 				Arrays.asList(IdxAuthRequestNode.class, IdxAuthStatusNode.class, IdxCheckEnrollmentStatus.class,
-						 IdxSponsorUser.class, IdxMobileAuthRequestNode.class, IdxMobileValidateAuthRequestNode.class));
+						 IdxSponsorUser.class, IdxMobileAuthRequestNode.class, IdxMobileValidateAuthRequestNode.class, DaonSaasOnboardingNode.class));
 	}
 
     /** 
@@ -86,6 +86,7 @@ public class IdxAuthRequestNodePlugin extends AbstractNodeAmPlugin {
 		pluginTools.upgradeAuthNode(IdxCheckEnrollmentStatus.class);
 		pluginTools.upgradeAuthNode(IdxMobileAuthRequestNode.class);
 		pluginTools.upgradeAuthNode(IdxMobileValidateAuthRequestNode.class);
+		pluginTools.upgradeAuthNode(DaonSaasOnboardingNode.class);
 		super.upgrade(fromVersion);
 	}
 
