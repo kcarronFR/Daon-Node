@@ -159,21 +159,23 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
     @Override
     public Action process(TreeContext context) throws NodeProcessException 
     {
-		System.out.println("Inside process...");
     	try
         {
-			System.out.println("Inside try on line 161");
         	logger.debug(loggerPrefix + "Started");
         	Map<String, List<String>> parameters = context.request.parameters;
+
+			System.out.println("parameters: "+ parameters);
         	JsonValue sharedState = context.sharedState;
-        	
+
         	if (parameters.containsKey(ERROR))
         	{
+				System.out.println("Key contains error");
         		throw new NodeProcessException("Onboarding failed:  " + parameters.get(ERROR).get(0));
         	}
+
         	if (parameters.containsKey(OIDC_CODE))
         	{
-				System.out.println("Value for parameters.containsKEy()");
+				System.out.println("Value for parameters.containsKey()");
 				if (sharedState.isDefined(OIDC_CODE))
 				{
 					// We have looped back from an unsuccessful attempt, remove sharedState and continue
@@ -221,7 +223,7 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 						String string_json = json.toString();
 						System.out.println("string_json: " + string_json);
 						final StringEntity entity = new StringEntity(string_json);
-						System.out.println("Entity: "+ entity);
+						System.out.println("Entity: " + entity);
 						post.setEntity(entity);
 
 						httpClient = HttpClientBuilder.create().build();
@@ -271,15 +273,15 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 						//String responseBody = response.body().string();
 
 				         Base64.Decoder decoder = Base64.getUrlDecoder();
-				         //JSONObject jsonResponse = new JSONObject(responseBody);
-				         //String token = jsonResponse.getString("id_token");
-//				         String[] parts = token.split("\\.");
-//				         if (!verifyToken(parts))
-//				         {
-//				        	 throw new NodeProcessException("Token could not be verified");
-//				         }
-//				         JSONObject payload = new JSONObject(new String(decoder.decode(parts[1])));
-//				         sharedState.put("payload", payload);
+				         JSONObject jsonResponse = new JSONObject(responseEntity);
+				         String token = jsonResponse.getString("id_token");
+				         String[] parts = token.split("\\.");
+				         if (!verifyToken(parts))
+				         {
+				        	 throw new NodeProcessException("Token could not be verified");
+				         }
+				         JSONObject payload = new JSONObject(new String(decoder.decode(parts[1])));
+				         sharedState.put("payload", payload);
 				         logger.debug(loggerPrefix + "Exiting with True Outcome");
 				         return Action.goTo(DaonSaasOnboardingNode.TRUE_OUTCOME_ID).replaceSharedState(sharedState).build();
 					}
@@ -288,7 +290,7 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 				}
 				} //else
 			}
-        	
+        	System.out.println("Did not get into OIDC if statement...");
         	// Redirecting to SaaS Onboarding site
 			String encodedUri = URLEncoder.encode(config.RedirectUri(), "UTF-8");
         	String baseUrl = "https://" + config.HostName() + 
@@ -353,6 +355,7 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
     
     private JSONArray getSigningKeys()
 	{
+
 		JSONArray signingKeys = new JSONArray();
 		
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -380,29 +383,20 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 
 				switch(key){
 					case "use":
-						if(value.equals("sig")) {use_flag = true; System.out.println("use is true...");}
+						if(value.equals("sig")) use_flag = true;
 					case "kty":
 						if(value.equals("RSA")) {
 							kty_flag = true;
-							System.out.println("kty is true...");
 						}
 				}
 
-				if(value.toString().contains("a") && value.toString().contains("e")) {
-					n_e_flag = true;
-					System.out.println("n_e_flag is true...");
-				}
+				if(value.toString().contains("a") && value.toString().contains("e")) n_e_flag = true;
 
-				System.out.println("key: " + key);
-				System.out.println("Value: " + value);
-	        	if (use_flag && kty_flag && n_e_flag)
-	        	{
-					System.out.println("Everything is true...");
-	        		signingKeys.put(key);
-	        	}
+	        	if (use_flag && kty_flag && n_e_flag) signingKeys.put(key);
 
 	        }
 			logger.debug("number of keys" + num_keys);
+		httpClient.close();
 		}
 		catch(Exception e)
 		{
