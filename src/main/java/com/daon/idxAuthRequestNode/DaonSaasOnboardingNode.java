@@ -211,10 +211,14 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 					System.out.println("Line 201 outside try statement");
 					try {
 						System.out.println("Line 202 try statement");
-						post.setHeader("Content-Type","application/json");
+						//post.setHeader("Content-Type","application/json");
+						item.put("Content-Type", "application/json");
+						item.put("Accept", "application/x-www-form-urlencoded");
 						//post.setHeader("client-key", config.clientKey()); Example from email
 						item.put("code", parameters.get(OIDC_CODE).get(0));
-						post.setHeader("grant_type", "authorization_code");
+
+						//post.setHeader("grant_type", "authorization_code");
+						item.put("grant_type", "authorization_code");
 						item.put("redirect_uri", config.RedirectUri());
 						item.put("client_secret", config.ClientSecret());
 						item.put("client_id", config.TenantName());
@@ -266,7 +270,16 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 
 
 						HttpEntity responseEntity = response.getEntity();
+						System.out.println("============");
+						System.out.println("responseEntity: " + responseEntity);
+						System.out.println("responseEntity (type): " + responseEntity.getClass().getSimpleName());
+						System.out.println("============");
 						String content = EntityUtils.toString(responseEntity);
+
+						System.out.println("============");
+						System.out.println("content: " + content);
+						System.out.println("content (type): " + content.getClass().getSimpleName());
+						System.out.println("============");
 
 						JSONObject retVal = new JSONObject(content);
 						System.out.println("retVal: " + retVal);
@@ -396,7 +409,7 @@ public class DaonSaasOnboardingNode extends AbstractDecisionNode
 
 	        }
 			logger.debug("number of keys" + num_keys);
-		httpClient.close();
+			httpClient.close();
 		}
 		catch(Exception e)
 		{
